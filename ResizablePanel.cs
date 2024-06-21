@@ -4,13 +4,14 @@ namespace Jiiks.WinForms.Controls;
 
 internal partial class ResizablePanel : Panel {
 
-    public ResizablePanel() {
-        if(KeepAspectCornerOnly) {
+    protected override void InitLayout() {
+        if (KeepAspectCornerOnly) {
             TopResize = false;
             RightResize = false;
             BottomResize = false;
             LeftResize = false;
         }
+        base.InitLayout();
     }
 
     private enum ResizeMode {
