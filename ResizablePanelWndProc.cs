@@ -6,6 +6,8 @@ internal partial class ResizablePanel : Panel {
     private const int WM_NCHITTEST = 0x84;
     private const int HTCLIENT = 0x1;
 
+    private const int HTCAPTION = 0x2;
+
     private const int HTTOP = 0xC;
     private const int HTBOTTOM = 0xF;
     private const int HTRIGHT = 0xB;
@@ -71,7 +73,7 @@ internal partial class ResizablePanel : Panel {
                 }
 
                 if(clientPoint.Y < ResizeBorderSize) {
-                    m.Result = HTTOP;
+                    m.Result = TopMovesInstead ? HTCAPTION : HTTOP;
                     return;
                 }
             }
@@ -115,6 +117,8 @@ internal partial class ResizablePanel {
     public bool KeepAspectCornerOnly { get; set; } = false;
     public Size Aspect { get; set; } = new Size(16, 9);
 
+    [Category("Resize Flags")]
+    public bool TopMovesInstead { get; set; } = true;
     [Category("Resize Flags")]
     public bool TopLeftResize { get; set; } = true;
     [Category("Resize Flags")]
