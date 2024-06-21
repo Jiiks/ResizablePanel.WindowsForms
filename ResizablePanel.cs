@@ -1,9 +1,21 @@
+using System.ComponentModel;
+using System.Windows.Forms;
+
+namespace Jiiks.WinForms.Controls;
 internal class ResizablePanel : Panel {
 
     [Description("Resize border size")]
     public int ResizeBorderSize { get; set; } = 10;
     [Description("Default Cursor")]
     public Cursor NormalCursor { get; set; } = Cursors.Default;
+    [Description("Border Colour")]
+    public Color BorderColour { get; set; } = Color.Black;
+    [Description("Border Style")]
+    public ButtonBorderStyle RBorderStyle { get; set; } = ButtonBorderStyle.Solid;
+    [Description("Border Width")]
+    public int BorderWidth { get; set; } = 1;
+
+    public void GlobalMouseMove(MouseEventArgs e) { }
 
     private enum ResizeMode {
         None,
@@ -75,13 +87,14 @@ internal class ResizablePanel : Panel {
 
             Size = newSize;
             Location = newLoc;
+            Refresh();
         }
 
         base.OnMouseMove(e);
     }
 
     protected override void OnMouseLeave(EventArgs e) {
-        Cursor = Cursors.Default;
+        Cursor = NormalCursor;
         base.OnMouseLeave(e);
     }
 
@@ -148,6 +161,27 @@ internal class ResizablePanel : Panel {
         Cursor = NormalCursor;
         _resizeMode = ResizeMode.None;
 
+    }
+
+    protected override void OnPaint(PaintEventArgs e) {
+        if(RBorderStyle != ButtonBorderStyle.None)
+            ControlPaint.DrawBorder(
+                    e.Graphics,
+                    ClientRectangle,
+                    BorderColour,
+                    BorderWidth,
+                    RBorderStyle,
+                    BorderColour,
+                    BorderWidth,
+                    RBorderStyle,
+                    BorderColour,
+                    BorderWidth,
+                    RBorderStyle,
+                    BorderColour,
+                    BorderWidth,
+                    RBorderStyle);
+
+        base.OnPaint(e);
     }
 
 }
