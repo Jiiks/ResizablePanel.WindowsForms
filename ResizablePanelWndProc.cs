@@ -28,52 +28,53 @@ internal partial class ResizablePanel : Panel {
         base.WndProc(ref m);
 
         if (m.Msg == WM_NCHITTEST) {
+            _hitTestLocation = Location;
             var res = (int)m.Result;
             var screenPoint = new Point(m.LParam.ToInt32());
             var clientPoint = PointToClient(screenPoint);
 
             if (res == HTCLIENT) {
-                if (clientPoint.X <= ResizeBorderSize && clientPoint.Y <= ResizeBorderSize) {
-                    m.Result = HTTOPLEFT;
+                if ((TopResize || TopMovesInstead) && clientPoint.Y < ResizeBorderSize && clientPoint.X > ResizeBorderSize && clientPoint.X < ClientSize.Width - ResizeBorderSize) {
+                    m.Result = TopMovesInstead ? HTCAPTION : HTTOP;
                     return;
                 }
 
-                if(clientPoint.X >= ClientSize.Width - ResizeBorderSize &&
-                    clientPoint.Y <= ResizeBorderSize) {
-                    m.Result = HTTOPRIGHT;
-                    return;
-                }
-
-                if (clientPoint.X >= ClientSize.Width - ResizeBorderSize &&
+                if (BottomRightResize && clientPoint.X >= ClientSize.Width - ResizeBorderSize &&
                     clientPoint.Y >= ClientSize.Height - ResizeBorderSize) {
                     m.Result = HTBOTTOMRIGHT;
                     return;
                 }
 
-                if(clientPoint.X <= ResizeBorderSize &&
+                if (TopLeftResize && clientPoint.X <= ResizeBorderSize && clientPoint.Y <= ResizeBorderSize) {
+                    m.Result = HTTOPLEFT;
+                    return;
+                }
+
+                if(TopRightResize && clientPoint.X >= ClientSize.Width - ResizeBorderSize &&
+                    clientPoint.Y <= ResizeBorderSize) {
+                    m.Result = HTTOPRIGHT;
+                    return;
+                }
+
+                if(BottomLeftResize && clientPoint.X <= ResizeBorderSize &&
                     clientPoint.Y >= ClientSize.Height - ResizeBorderSize) {
                     m.Result = HTBOTTOMLEFT;
                     return;
                 }
 
 
-                if(clientPoint.X > ClientSize.Width - ResizeBorderSize) {
+                if(RightResize && clientPoint.X > ClientSize.Width - ResizeBorderSize) {
                     m.Result = HTRIGHT;
                     return;
                 }
 
-                if(clientPoint.X < ResizeBorderSize) {
+                if(TopLeftResize && clientPoint.X < ResizeBorderSize) {
                     m.Result = HTLEFT;
                     return;
                 }
 
-                if(clientPoint.Y > ClientSize.Height -  ResizeBorderSize) {
+                if(BottomResize && clientPoint.Y > ClientSize.Height -  ResizeBorderSize) {
                     m.Result = HTBOTTOM;
-                    return;
-                }
-
-                if(clientPoint.Y < ResizeBorderSize) {
-                    m.Result = TopMovesInstead ? HTCAPTION : HTTOP;
                     return;
                 }
             }
@@ -99,6 +100,24 @@ internal partial class ResizablePanel : Panel {
                     RBorderStyle);
 
         base.OnPaint(e);
+    }
+
+    private Point _hitTestLocation;
+    protected override void OnResize(EventArgs eventargs) {
+        base.OnResize(eventargs);
+
+        // respect min size
+        if (Width < MinimumSize.Width) {
+            Width = MinimumSize.Width;
+            Location = _hitTestLocation;
+        }
+        if(Height < MinimumSize.Height) {
+            Height = MinimumSize.Height;
+            Location = _hitTestLocation;
+        }
+
+        if(KeepAspectCornerOnly)
+            Width = (int)(Height * Aspect.Width / Aspect.Height);
     }
 }
 
