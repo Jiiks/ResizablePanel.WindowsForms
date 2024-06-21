@@ -4,7 +4,14 @@ namespace Jiiks.WinForms.Controls;
 
 internal partial class ResizablePanel : Panel {
 
-    public void GlobalMouseMove(MouseEventArgs e) { }
+    public ResizablePanel() {
+        if(KeepAspectCornerOnly) {
+            TopResize = false;
+            RightResize = false;
+            BottomResize = false;
+            LeftResize = false;
+        }
+    }
 
     private enum ResizeMode {
         None,
